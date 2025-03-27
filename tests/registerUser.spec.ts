@@ -1,14 +1,16 @@
 import { test, expect } from "@playwright/test";
 
 test.describe("Register Form", () => {
+
+    const URL_BASE: string = "https://pushing-it.vercel.app";
+    
     test.beforeEach(async ({ page }) => {
-        const URL_BASE: string = "https://pushing-it.vercel.app";
         await page.goto(URL_BASE);
     });
 
     test("Register new user", async ({ page }) => {
         const USER: string = generateRandomString(5);
-        const PASS: string = generateRandomString(10);
+        const PASS: string = generateRandomString(10)+"$$";
         const RADIOS_BUTTONS: Array<string> = [
             ".chakra-radio__control.css-vtg3j9[data-cy='Male']",
             ".chakra-radio__control.css-vtg3j9[data-cy='Female']",
@@ -23,8 +25,10 @@ test.describe("Register Form", () => {
         await page.selectOption('select[name="month"]', { label: "January" });
         await page.selectOption('select[name="year"]', { label: "2000" });
         await page.click('button[type="submit"]');
+        await page.waitForURL(URL_BASE + '/home');
 
-        expect(page.getByRole("heading", { name: "Welcome " + USER }));
+        expect(page.getByRole("heading", { name: "Welcome " + USER })).toBeVisible();
+        expect(page.url()).toContain("/home");
     });
 });
 
